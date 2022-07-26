@@ -14,7 +14,7 @@ ui.layout(
     <drawer id="drawer">
         <vertical>
             <appbar>
-                <toolbar id="toolbar" bg="#ff4fb3ff" title="强国助手"/>
+                <toolbar id="toolbar" bg="#ff4fb3ff" title="强国助手Jun"/>
                 <tabs id="tabs" bg="#ff4fb3ff"/>
             </appbar>
             <viewpager id="viewpager">
@@ -491,14 +491,14 @@ var thread = null;
 Initialize();
 
 // 版本更新检查
-var apkurl = "https://sp.sec-an.cn/storage01/Better-Auto-XXQG/v2.1.0.apk";
-var latest_version = "2.1.0";
-if (GLOBAL_CONFIG.get("NO_UPDATE", 0) && (app.versionName != latest_version)) {
-    ui.update.visibility = 0;
-    ui.update.setText("点击更新至最新版v" + latest_version);
-} else if (app.versionName != latest_version) {
-    checkversion();
-}
+//var apkurl = "https://sp.sec-an.cn/storage01/Better-Auto-XXQG/v2.1.0.apk";
+//var latest_version = "2.1.0";
+//if (GLOBAL_CONFIG.get("NO_UPDATE", 0) && (app.versionName != latest_version)) {
+//    ui.update.visibility = 0;
+//    ui.update.setText("点击更新至最新版v" + latest_version);
+//} else if (app.versionName != latest_version) {
+//    checkversion();
+//}
 
 
 // 创建选项菜单(右上角)
@@ -515,7 +515,7 @@ ui.emitter.on("options_item_selected", (e, item)=>{
             app.startActivity("console");
             break;
         case "关于":
-            alert("关于", "强国助手 v"+latest_version);
+            alert("关于", "强国助手Jun v"+latest_version);
             break;
         case "Github":
             app.openUrl("https://github.com/sec-an/Better-Auto-XXQG");
@@ -609,10 +609,8 @@ ui.start.click(function () {
     }
     threads.start(function () {
         let url = [
-            'https://sp.sec-an.cn/storage01/Better-Auto-XXQG/'+ui.script_chosen.getSelectedItemPosition()+'.js',
-            'https://ghproxy.com/https://raw.githubusercontent.com/sec-an/Better-Auto-XXQG/main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
-            'https://cdn.jsdelivr.net/gh/sec-an/Better-Auto-XXQG@main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
-            'https://raw.githubusercontent.com/sec-an/Better-Auto-XXQG/main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
+            'https://github.com/loveactually288/loveactually/raw/main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
+            'http://cdn.jsdelivr.net/china/loveactually288/loveactually@3.0/'+ui.script_chosen.getSelectedItemPosition()+'.js',
         ];
         for (var i = 0; i < url.length; i++) {
             try {
@@ -627,7 +625,7 @@ ui.start.click(function () {
             } catch (error) {}
         }
         toastLog("开始积分判断运行");
-        execution = engines.execScript("强国助手", study);
+        execution = engines.execScript("强国助手Jun", study);
     });
 });
 
@@ -901,28 +899,28 @@ function check_baidu_api() {
 }
 
 // APP更新提示
-function checkversion() {
-    var releaseNotes = "版本 v" + latest_version + "\n" +
-        "更新日志:\n" +
-        "* 1.基于AutoX v6.2.3重新打包\n" +
-        "* 2.新增多个备选脚本,有待测试"
-    dialogs.build({
-            title: "发现新版本",
-            content: releaseNotes,
-            positive: "立即下载",
-            negative: "取消",
-            neutral: "浏览器下载",
-            checkBoxPrompt: "不再提示",
-            cancelable: false
-        })
-        .on("positive", download)
-        .on("neutral", () => {
-            app.openUrl(apkurl);
-        })
-        .on("check", (checked) => {
-            GLOBAL_CONFIG.put("NO_UPDATE", 1);
-        }).show();
-}
+//function checkversion() {
+//    var releaseNotes = "版本 v" + latest_version + "\n" +
+//        "更新日志:\n" +
+//        "* 1.基于AutoX v6.2.3重新打包\n" +
+//        "* 2.新增多个备选脚本,有待测试"
+//    dialogs.build({
+//            title: "发现新版本",
+//            content: releaseNotes,
+//            positive: "立即下载",
+//            negative: "取消",
+//            neutral: "浏览器下载",
+//            checkBoxPrompt: "不再提示",
+//            cancelable: false
+//        })
+//        .on("positive", download)
+//        .on("neutral", () => {
+//            app.openUrl(apkurl);
+//        })
+//        .on("check", (checked) => {
+//            GLOBAL_CONFIG.put("NO_UPDATE", 1);
+//        }).show();
+//}
 
 // 打开下载进度面板
 function download() {
