@@ -2632,7 +2632,7 @@ if (zhanghao) {
     let userinfo = zh.split(/:|：/);
     zhanghao_list.push(userinfo);
   };
-  if (zhanghao_list.length > 10) {zhanghao_list.length = 10;}
+  if (zhanghao_list.length > 20) {zhanghao_list.length = 20;}
   //console.verbose(zhanghao_list);
   for (let userinfo of zhanghao_list) {
     console.verbose(userinfo);
@@ -2649,10 +2649,10 @@ if (noverify_thread.isAlive()) {
   noverify_thread.interrupt();
 }
 
-// main("18802583389", "xhbj.39000");
-// main("15849082086", "zhangfpan0711");
-// main("17684809426", "qxpcdodo");
-// main("18647101545", "zhoukun147753");
+// main("", "");
+// main("", "");
+// main("", "");
+// main("", "");
 
 /*****************结束后配置*****************/
 //console.show();
