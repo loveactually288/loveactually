@@ -4,7 +4,7 @@ http.__okhttp__.setTimeout(10000);
 
 let url = [
     'https://raw.githubusercontent.com/loveactually288/loveactually/main/UI.js',
-    'http://cdn.jsdelivr.net/china/loveactually288/loveactually@3.0/UI.js',
+    'http://cdn.jsdelivr.net/china/gh/loveactually288/loveactually@3.0/UI.js',
 ];
 
 for (var i = 0; i < url.length; i++) {
