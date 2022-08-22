@@ -610,7 +610,7 @@ ui.start.click(function () {
     threads.start(function () {
         let url = [
             'https://github.com/loveactually288/loveactually/raw/main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
-            'http://cdn.jsdelivr.net/china/gh/loveactually288/loveactually@3.0/'+ui.script_chosen.getSelectedItemPosition()+'.js',
+            'https://cdn.jsdelivr.net/gh/loveactually288/loveactually@raw/main/'+ui.script_chosen.getSelectedItemPosition()+'.js',
         ];
         for (var i = 0; i < url.length; i++) {
             try {
