@@ -16,7 +16,7 @@ var meiri = TTXS_PRO_CONFIG.get("meiri", true);
 var meizhou = TTXS_PRO_CONFIG.get("meizhou", 0);
 var zhuanxiang = TTXS_PRO_CONFIG.get("zhuanxiang", 0);
 var tiaozhan = TTXS_PRO_CONFIG.get("tiaozhan", true);
-var ocr_plugin = TTXS_PRO_CONFIG.get("ocr_plugin", false);
+var ocr_choice = TTXS_PRO_CONFIG.get("ocr_choice", 0);
 var ocr_maxtime = TTXS_PRO_CONFIG.get("ocr_maxtime", "5000");
 var duizhan_mode = TTXS_PRO_CONFIG.get("duizhan_mode", 0);
 var jisu = TTXS_PRO_CONFIG.get("jisu", "0");
@@ -30,6 +30,46 @@ var pushplus = TTXS_PRO_CONFIG.get("pushplus", "");
 var yl_on = TTXS_PRO_CONFIG.get("yl_on", true);
 var yinliang = TTXS_PRO_CONFIG.get("yinliang", "0");
 var zhanghao = TTXS_PRO_CONFIG.get("zhanghao", "");
+
+function google_ocr_api(img) {
+  console.log('GoogleMLKit文字识别中');
+  let list = JSON.parse(JSON.stringify(gmlkit.ocr(img,"zh").toArray(3))); // 识别文字，并得到results
+  let eps = 30; // 坐标误差
+  for (
+      var i = 0; i < list.length; i++ // 选择排序对上下排序,复杂度O(N²)但一般list的长度较短只需几十次运算
+  ) {
+      for (var j = i + 1; j < list.length; j++) {
+          if (list[i]['bounds']['bottom'] > list[j]['bounds']['bottom']) {
+              var tmp = list[i];
+              list[i] = list[j];
+              list[j] = tmp;
+          }
+      }
+  }
+
+  for (
+      var i = 0; i < list.length; i++ // 在上下排序完成后，进行左右排序
+  ) {
+      for (var j = i + 1; j < list.length; j++) {
+          // 由于上下坐标并不绝对，采用误差eps
+          if (
+              Math.abs(list[i]['bounds']['bottom'] - list[j]['bounds']['bottom']) <
+              eps &&
+              list[i]['bounds']['left'] > list[j]['bounds']['left']
+          ) {
+              var tmp = list[i];
+              list[i] = list[j];
+              list[j] = tmp;
+          }
+      }
+  }
+  let res = '';
+  for (var i = 0; i < list.length; i++) {
+      res += list[i]['text'];
+  }
+  list = null;
+  return res;
+}
 
 function paddle_ocr_api() {
   console.log('PaddleOCR文字识别中');
@@ -66,7 +106,7 @@ function paddle_ocr_api() {
   }
   let res = '';
   for (var i = 0; i < list.length; i++) {
-      res += list[i]['words'];
+      res += list[i]['text'];
   }
   list = null;
   return res;
@@ -97,7 +137,7 @@ fInfo("天天向上Pro"+newest_version+"脚本初始化");
 var [device_w, device_h] = init_wh();
 // log("fina:", device_w, device_h);
 // OCR初始化，重写内置OCR module
-if (ocr_plugin) {
+if (ocr_choice == 2) {
   fInfo("初始化第三方ocr插件");
   try {
     ocr = plugins.load("com.hraps.ocr");
@@ -980,7 +1020,9 @@ function do_duizhan1(renshu) {
       // 为了适配OCR插件改为下面这句
       console.time('题目识别');
       
-    if (!ocr_plugin) {
+    if (ocr_choice == 0) {
+        var que_txt = google_ocr_api(que_img).replace(/[^\u4e00-\u9fa5\d]|\d{1,2}\./g, "");
+    } else if (ocr_choice == 1) {
         var que_txt = paddle_ocr_api(que_img).replace(/[^\u4e00-\u9fa5\d]|\d{1,2}\./g, "");
     } else {
         var que_txt = ocr.recognizeText(que_img).replace(/[^\u4e00-\u9fa5\d]|\d{1,2}\./g, "");
@@ -1091,12 +1133,15 @@ function do_duizhan1(renshu) {
 		//images.save(allx_img, '/sdcard/1/x_img' + num + '.png');
     let xuan_txt_list = [];
     let allx_txt = "";
-    if (!ocr_plugin) {
+    if (ocr_choice == 0) {
       // 排序顺序
       //     console.time('选项识别1');
-      let x_results = JSON.parse(JSON.stringify(paddle.ocr(img)));
+      let x_results = JSON.parse(JSON.stringify(gmlkit.ocr(img,"zh").toArray(3)));
       allx_txt = ocr_rslt_to_txt(x_results).replace(/\s+/g, "");
       //     console.timeEnd('选项识别1');
+    } else if (ocr_choice == 1) {
+      let x_results = JSON.parse(JSON.stringify(paddle.ocr(img)));
+      allx_txt = ocr_rslt_to_txt(x_results).replace(/\s+/g, "");
     } else {
 //     // 直接识别
 //     console.time('选项识别2');
@@ -1669,7 +1714,9 @@ function get_ans_by_ocr1() {
 //   let resp = ocr.recognize(img).results;
 //   ans = ocr_rslt_to_txt(resp);
   // 为适配第三方OCR改动
-  if (!ocr_plugin) {
+  if (ocr_choice == 0) {
+    ans = google_ocr_api(img);
+  } else if (ocr_choice == 1) {
     ans = paddle_ocr_api(img);
   } else {
     ans = ocr.recognizeText(img);
@@ -1898,13 +1945,13 @@ function ocr_rslt_to_txt(result) {
     if (top == 0) {top = result[idx].bounds.top;}
     if (previous_left == 0) {previous_left = result[idx].bounds.left;}
     if (result[idx].bounds.top >= top-10 && result[idx].bounds.top <= top+10) {
-      if (result[idx].bounds.left > previous_left) {txt = txt + "   " + result[idx].words;}
-      else {txt = result[idx].words + "   " + txt;}
+      if (result[idx].bounds.left > previous_left) {txt = txt + "   " + result[idx].text;}
+      else {txt = result[idx].text + "   " + txt;}
     }
     else {
       top = result[idx].bounds.top;
       txt_list.push(txt);
-      txt = result[idx].words;
+      txt = result[idx].text;
     }
     if (idx == result.length-1) {txt_list.push(txt);}
     previous_left = result[idx].bounds.left;
@@ -1945,18 +1992,10 @@ function restart(restart_flag) {
 
 // 从首页进入积分界面初始化
 function jifen_init() {
-  id("comm_head_xuexi_score").findOne().click();
-  while (true) {
-    let denglu = className("android.view.View").depth(24).text("登录").findOne(9000);
-    if (denglu) {break;}
-    back();
-    sleep(1000);
-    id("comm_head_xuexi_score").findOne().click();
-  }
+  for (id("comm_head_xuexi_score").findOne().click(); !className("android.view.View").text("登录").findOne(9E3);) back(), sleep(1E3), id("comm_head_xuexi_score").findOne().click();
   fRefocus();
   text("登录").waitFor();
-  className("android.webkit.WebView").scrollable().findOne().scrollForward();
-  //jifen_list = className("android.widget.ListView").depth(21).findOne();
+  className("android.webkit.WebView").scrollable().findOne().scrollForward()
 }
 
 // 模拟随机时间0.5-3秒，后期可以用户自定义
@@ -2041,7 +2080,9 @@ function ocr_test() {
     //console.time("OCR识别结束");
     let begin=new Date();
     
-    if (!ocr_plugin) {
+    if (ocr_choice == 0) {
+      let test_txt  = google_ocr_api(img_test);
+    } else if (ocr_choice == 1){
       let test_txt  = paddle_ocr_api(img_test);
     } else {
       let test_txt  = ocr.recognizeText(img_test);
@@ -2399,24 +2440,24 @@ function xxqg(userinfo) {
   nolocate_thread.isAlive() && (nolocate_thread.interrupt(), fInfo("终止位置权限弹窗检测"));
   noupdate_thread.isAlive() && (noupdate_thread.interrupt(), fInfo("终止更新弹窗检测"));
   nonotice_thread.isAlive() && (nonotice_thread.interrupt(), fInfo("终止消息通知检测"));
-  "true" == pinglun && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["评论"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["评论"]).child(3).child(0).text()) && (toastLog("开始评论"), do_pinglun(), jifen_list = refind_jifen());
-  "true" == shipin && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["视频"]).child(3).text() || "new" ==
+  true == pinglun && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["评论"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["评论"]).child(3).child(0).text()) && (toastLog("开始评论"), do_pinglun(), jifen_list = refind_jifen());
+  true == shipin && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["视频"]).child(3).text() || "new" ==
       jifen_flag && "已完成" != jifen_list.child(jifen_map["视频"]).child(4).text()) && (console.verbose("无障碍服务：" + auto.service), toastLog("开始视听次数"), do_shipin(), jifen_list = refind_jifen());
-  "true" == wenzhang && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["文章"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["文章"]).child(4).text()) && (console.verbose("无障碍服务：" +
+  true == wenzhang && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["文章"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["文章"]).child(4).text()) && (console.verbose("无障碍服务：" +
       auto.service), toastLog("开始文章次数与时长"), do_wenzhang(), jifen_list = refind_jifen());
-  "true" == meiri && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["每日"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["每日"]).child(4).text()) && (toastLog("每日答题开始"), do_meiri(), jifen_list = refind_jifen());
-  noupdate_thread = 1;
-  if ("false" != meizhou && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["每周"]).child(2).text().match(/\d+/)[0] ||
+  true == meiri && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["每日"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["每日"]).child(4).text()) && (toastLog("每日答题开始"), do_meiri(), jifen_list = refind_jifen());
+  c = 1;
+  if (2 != meizhou && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["每周"]).child(2).text().match(/\d+/)[0] ||
           "new" == jifen_flag && "0" == jifen_list.child(jifen_map["每周"]).child(3).child(0).text())) {
       toastLog("每周答题开始");
       for (c = do_meizhou(); !c;) c = do_meizhou();
       jifen_list = refind_jifen()
   }
-  "false" != zhuanxiang && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["专项"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["专项"]).child(3).child(0).text()) && (toastLog("专项答题开始"), do_zhuanxiang(), jifen_list =
+  2 != zhuanxiang && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["专项"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["专项"]).child(3).child(0).text()) && (toastLog("专项答题开始"), do_zhuanxiang(), jifen_list =
       refind_jifen());
-  "true" == tiaozhan && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["挑战"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["挑战"]).child(4).text()) && (toastLog("挑战答题开始"), do_tiaozhan(), jifen_list = refind_jifen());
+  true == tiaozhan && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["挑战"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["挑战"]).child(4).text()) && (toastLog("挑战答题开始"), do_tiaozhan(), jifen_list = refind_jifen());
   if (ocr_test()) {
-      if ("true" == siren && ("old" == jifen_flag && 3 >= parseInt(jifen_list.child(jifen_map["四人"]).child(2).text().match(/\d+/)[0]) || "new" == jifen_flag && 3 >= parseInt(jifen_list.child(jifen_map["四人"]).child(3).child(0).text()))) {
+      if (true == siren && ("old" == jifen_flag && 3 >= parseInt(jifen_list.child(jifen_map["四人"]).child(2).text().match(/\d+/)[0]) || "new" == jifen_flag && 3 >= parseInt(jifen_list.child(jifen_map["四人"]).child(3).child(0).text()))) {
           toastLog("四人赛开始");
           guaji && do_duizhan1(0);
           do_duizhan1(4);
@@ -2425,15 +2466,15 @@ function xxqg(userinfo) {
               for (fSet("title", "平衡胜率…"), fClear(), console.info("开始平衡胜率，答错次数：" + d), i = 0; i < d; i++) fInfo("答错第" + (i + 1) + "轮"), dacuo(4), fClear();
           jifen_list = refind_jifen()
       }
-      "true" == shuangren && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["双人"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["双人"]).child(3).child(0).text()) &&
+      true == shuangren && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["双人"]).child(2).text().match(/\d+/)[0] || "new" == jifen_flag && "0" == jifen_list.child(jifen_map["双人"]).child(3).child(0).text()) &&
           (toastLog("双人对战开始"), do_duizhan1(2), jifen_list = refind_jifen())
-  } else "true" == siren && "true" == shuangren && sign_list.push("ocr_false");
-  "true" == bendi && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["本地"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["本地"]).child(4).text()) && (toastLog("本地开始"), do_bendi(), jifen_list = refind_jifen());
+  } else true == siren && true == shuangren && sign_list.push("ocr_false");
+  true == bendi && ("old" == jifen_flag && "已完成" != jifen_list.child(jifen_map["本地"]).child(3).text() || "new" == jifen_flag && "已完成" != jifen_list.child(jifen_map["本地"]).child(4).text()) && (toastLog("本地开始"), do_bendi(), jifen_list = refind_jifen());
   d = 1;
-  "false" != dingyue && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["订阅"]).child(2).text().match(/\d+/)[0] ||
+  0 != dingyue && ("old" == jifen_flag && "0" == jifen_list.child(jifen_map["订阅"]).child(2).text().match(/\d+/)[0] ||
       "new" == jifen_flag && "0" == jifen_list.child(jifen_map["订阅"]).child(3).child(0).text()) && (toastLog("订阅开始"), d = do_dingyue(), jifen_list = refind_jifen());
-  "false" == meizhou || c || fError("每周答题可能由于识别错误、包含视频题而不能满分，请手动作答");
-  "false" == dingyue || d || fError("未能识别出订阅界面，订阅不支持学习强国V2.33.0以上版本");
+  2 == meizhou || c || fError("每周答题可能由于识别错误、包含视频题而不能满分，请手动作答");
+  0 == dingyue || d || fError("未能识别出订阅界面，订阅不支持学习强国V2.33.0以上版本");
   if (pushplus || token) {
       fInfo("推送前等待积分刷新5秒");
       sleep(5E3);
@@ -2554,3 +2595,4 @@ sleep(10000);
 console.hide();
 home();
 exit();
+
