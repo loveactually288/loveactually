@@ -2554,7 +2554,3 @@ sleep(10000);
 console.hide();
 home();
 exit();
-
-×
-拖拽到此处
-图片将完成下载
