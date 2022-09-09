@@ -396,14 +396,14 @@ ui.layout(
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的API Key" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的API Key" />
                                     <input id="study_AK" text=""  gravity="center" textSize="13sp" />
                                 </vertical> 
                             </horizontal>
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的Secret Key" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的Secret Key" />
                                     <input id="study_SK" text=""  gravity="center" textSize="13sp" />
                                 </vertical> 
                             </horizontal>
@@ -456,7 +456,7 @@ ui.layout(
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="push+ 消息推送" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="push+ 消息推送" />
                                     <text w="auto" textColor="#999999" textSize="12sp" text="注：有需要的自行填写push+的Token，否则留空即可" />
                                     <input id="study_Token" text="" textSize="13sp" />
                                 </vertical> 
@@ -489,8 +489,8 @@ var thread = null;
 Initialize();
 
 // 版本更新检查
-var apkurl = "https://ghproxy.com/https://raw.githubusercontent.com/sec-an/Better-Auto-XXQG/main/v2.1.0.apk";
-var latest_version = "2.1.0";
+var apkurl = "https://gh.fakev.cn/sec-an/Better-Auto-XXQG/releases/download/v2.2.0/v2.2.0.apk";
+var latest_version = "2.2.0";
 if (GLOBAL_CONFIG.get("NO_UPDATE", 0) && (app.versionName != latest_version)) {
     ui.update.visibility = 0;
     ui.update.setText("点击更新至最新版v" + latest_version);
@@ -884,8 +884,8 @@ function check_baidu_api() {
 function checkversion() {
     var releaseNotes = "版本 v" + latest_version + "\n" +
         "更新日志:\n" +
-        "* 1.基于AutoX v6.2.3重新打包\n" +
-        "* 2.新增多个备选脚本,有待测试"
+        "* 1.基于AutoX v6.3.4重新打包\n" +
+        "* 2.调整默认OCR为Google ML kIT OCR"
     dialogs.build({
             title: "发现新版本",
             content: releaseNotes,
