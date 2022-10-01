@@ -1910,7 +1910,7 @@ function get_ans_by_tiku(que_txt) {
 // 获取直链json
 function get_tiku_by_http(link) {
   // 通过gitee的原始数据保存题库
-  if (!link) {link = "https://mart-17684809426.coding.net/p/tiku/d/tiku/git/raw/master/tiku_json.txt"}
+  if (!link) {link = "https://gitcode.net/McMug2020/XXQG_TiKu/-/raw/master/tiku_json.txt"}
   let req = http.get(link);
   log(req.statusCode);
   // 更新题库时若获取不到，则文件名+1
