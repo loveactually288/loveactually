@@ -610,7 +610,7 @@ ui.start.click(function () {
         return;
     }
     threads.start(function () {
-        let url = 'https://gitcode.net/lixingjun1820/xx/-/raw/main/'+ui.script_chosen.getSelectedItemPosition()+'.js';
+        let url = 'https://ghproxy.com/https://raw.githubusercontent.com/loveactually288/loveactually/main/'+ui.script_chosen.getSelectedItemPosition()+'.js';
         execution = engines.execScript("强国助手Jun", http.get(url).body.string());
     });
 });
