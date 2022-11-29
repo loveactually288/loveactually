@@ -196,6 +196,13 @@ ui.layout(
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="太空三人行" />
+                                </vertical> 
+                                <checkbox id="ttxs_pro_sanren" marginLeft="4" marginRight="6" checked="true" />
+                            </horizontal>
+                            <horizontal  gravity="center_vertical" padding="5 5" >
+                                <View bg="#00BFFF" h="*" w="10"  ></View>
+                                <vertical padding="10 8" h="auto" w="0" layout_weight="1">
                                     <text w="auto" textColor="#222222" textSize="15sp" text="四人赛" />
                                 </vertical>
                                 <checkbox id="ttxs_pro_siren" marginLeft="4" marginRight="6" checked="true" />
@@ -396,14 +403,14 @@ ui.layout(
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的API Key" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的API Key" />
                                     <input id="study_AK" text=""  gravity="center" textSize="13sp" />
                                 </vertical> 
                             </horizontal>
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的Secret Key" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="百度OCR的Secret Key" />
                                     <input id="study_SK" text=""  gravity="center" textSize="13sp" />
                                 </vertical> 
                             </horizontal>
@@ -456,7 +463,7 @@ ui.layout(
                             <horizontal  gravity="center_vertical" padding="5 5" >
                                 <View bg="#00BFFF" h="*" w="10"  ></View>
                                 <vertical padding="10 8" h="auto" w="0" layout_weight="1">
-                                    <text w="auto" textColor="#222222" textSize="15sp" text="push+ 消息推送" />
+                                    <text w="auto" textColor="#222222" textSize="15sp" text="push+ 消息推送" />
                                     <text w="auto" textColor="#999999" textSize="12sp" text="注：有需要的自行填写push+的Token，否则留空即可" />
                                     <input id="study_Token" text="" textSize="13sp" />
                                 </vertical> 
@@ -610,8 +617,8 @@ ui.start.click(function () {
         return;
     }
     threads.start(function () {
-        let url = 'https://ghproxy.com/https://raw.githubusercontent.com/loveactually288/loveactually/main/'+ui.script_chosen.getSelectedItemPosition()+'.js';
-        execution = engines.execScript("强国助手Jun", http.get(url).body.string());
+        let url = 'https://ghproxy.com/https://raw.githubusercontent.com/sec-an/Better-Auto-XXQG/main/'+ui.script_chosen.getSelectedItemPosition()+'.js';
+        execution = engines.execScript("强国助手", http.get(url).body.string());
     });
 });
 
@@ -634,6 +641,7 @@ ui.ttxs_pro_save.click(function () {
     TTXS_PRO_CONFIG.put("duizhan_mode", ui.ttxs_pro_duizhan_mode.getSelectedItemPosition());
     TTXS_PRO_CONFIG.put("jisu", ui.ttxs_pro_jisu.getText()+"");
     TTXS_PRO_CONFIG.put("guaji", ui.ttxs_pro_guaji.isChecked());
+    TTXS_PRO_CONFIG.put("sanren", ui.ttxs_pro_sanren.isChecked());
     TTXS_PRO_CONFIG.put("siren", ui.ttxs_pro_siren.isChecked());
     TTXS_PRO_CONFIG.put("dacuo_num", ui.ttxs_pro_dacuo_num.getText()+"");
     TTXS_PRO_CONFIG.put("shuangren", ui.ttxs_pro_shuangren.isChecked());
@@ -683,6 +691,8 @@ ui.ttxs_pro_reset.click(function () {
     ui.ttxs_pro_jisu.setText(TTXS_PRO_CONFIG.get("jisu"));
     TTXS_PRO_CONFIG.put("guaji", true);
     ui.ttxs_pro_guaji.setChecked(TTXS_PRO_CONFIG.get("guaji"));
+    TTXS_PRO_CONFIG.put("sanren", true);
+    ui.ttxs_pro_sanren.setChecked(TTXS_PRO_CONFIG.get("sanren"));
     TTXS_PRO_CONFIG.put("siren", true);
     ui.ttxs_pro_siren.setChecked(TTXS_PRO_CONFIG.get("siren"));
     TTXS_PRO_CONFIG.put("dacuo_num", "2");
