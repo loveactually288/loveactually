@@ -283,10 +283,10 @@ function do_pinglun() {
   sleep(1000);
   text("发布").findOne().click();
   sleep(1000);
-  text("删除").findOne().click();
-  sleep(1000);
-  text("确认").findOne().click();
-  sleep(1000);
+  // text("删除").findOne().click();
+  // sleep(1000);
+  // text("确认").findOne().click();
+  // sleep(1000);
   //   // 下面是分享
   //   for (let i=0; i<2; i++) {
   //     text_edit.findOne().parent().child(3).click();
